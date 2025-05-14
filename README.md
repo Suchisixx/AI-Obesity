@@ -1,8 +1,9 @@
-# Hướng Dẫn Dự Án AI-Obesity
+## Hướng Dẫn Dự Án AI-Obesity
 
-## 1. Giới Thiệu Dự Án
+### 1. Giới Thiệu Dự Án
 
 **AI-Obesity** là một dự án sử dụng trí tuệ nhân tạo sử dụng mô hình XGBoost để **dự đoán tình trạng béo phì** dựa trên dữ liệu thực tế. Nhằm hỗ trợ các nghiên cứu y tế và chăm sóc sức khỏe.
+- Nguồn dữ liệu : https://www.kaggle.com/datasets/suleymansulak/obesity-dataset
 
 ### Mục tiêu:
 - Phân loại các mức độ béo phì dựa trên đặc trưng người dùng.
