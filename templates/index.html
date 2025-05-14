@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dự đoán tình trạng béo phì</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #10b981;
+            --primary-dark: #059669;
+            --primary-light: #d1fae5;
+            --secondary: #0ea5e9;
+            --secondary-dark: #0284c7;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --light-gray: #e2e8f0;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            color: var(--dark);
+            min-height: 100vh;
+            padding: 2rem 0;
+        }
+        
+        .container {
+            max-width: 1200px;
+        }
+        
+        .form-container {
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            backdrop-filter: blur(10px);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .form-container:hover {
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+        }
+        
+        .form-header {
+            background: linear-gradient(to right, rgba(16, 185, 129, 0.05), rgba(14, 165, 233, 0.05));
+            padding: 2rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .form-title {
+            color: var(--primary-dark);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-subtitle {
+            color: var(--gray);
+            font-weight: 400;
+        }
+        
+        .form-body {
+            padding: 2rem;
+        }
+        
+        .form-label {
+            font-weight: 500;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-control, .form-select {
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--light-gray);
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.25rem rgba(16, 185, 129, 0.25);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            border-color: var(--primary);
+            padding: 0.75rem 2rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover, .btn-primary:focus {
+            background-color: var(--primary-dark);
+            border-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .btn-outline-secondary {
+            color: var(--gray);
+            border-color: var(--light-gray);
+            padding: 0.75rem 2rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-outline-secondary:hover {
+            background-color: var(--light-gray);
+            color: var(--dark);
+        }
+        
+        .btn-sample {
+            border-radius: 0.5rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .btn-sample-class1 {
+            background-color: #f0fdf4;
+            border-color: #86efac;
+            color: #15803d;
+        }
+        
+        .btn-sample-class2 {
+            background-color: #e0f7fa;
+            border-color: #4dd0e1;
+            color: #0e7490;
+        }
+        
+        .btn-sample-class3 {
+            background-color: #fefce8;
+            border-color: #facc15;
+            color: #a16207;
+        }
+        
+        .btn-sample-class4 {
+            background-color: #fef2f2;
+            border-color: #f87171;
+            color: #b91c1c;
+        }
+        
+        .btn-sample:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn-sample.active {
+            background-color: var(--primary);
+            border-color: var(--primary-dark);
+            color: white;
+        }
+        
+        .sample-selection-text {
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--primary-dark);
+            font-weight: 500;
+        }
+        
+        .nav-tabs {
+            border-bottom: 1px solid var(--light-gray);
+            margin-bottom: 2rem;
+        }
+        
+        .nav-tabs .nav-link {
+            color: var(--gray);
+            border: none;
+            padding: 1rem 1.5rem;
+            border-radius: 0;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-tabs .nav-link.active {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+            background-color: transparent;
+        }
+        
+        .nav-tabs .nav-link:hover:not(.active) {
+            color: var(--dark);
+            border-bottom: 3px solid var(--light-gray);
+        }
+        
+        .tab-icon {
+            margin-right: 0.5rem;
+        }
+        
+        .progress {
+            height: 0.5rem;
+            border-radius: 1rem;
+            background-color: var(--light-gray);
+        }
+        
+        .progress-bar {
+            background-color: var(--primary);
+            border-radius: 1rem;
+        }
+        
+        .result-container {
+            background: linear-gradient(to right, rgba(16, 185, 129, 0.1), rgba(14, 165, 233, 0.1));
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-top: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .result-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+        }
+        
+        .result-title {
+            color: var(--primary-dark);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .result-content {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .result-note {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .tab-pane {
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .spinner-border {
+            width: 1.5rem;
+            height: 1.5rem;
+            margin-right: 0.5rem;
+        }
+        
+        /* Micro-interactions */
+        .form-control:focus, .form-select:focus {
+            transform: translateY(-2px);
+        }
+        
+        .btn {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.5);
+            opacity: 0;
+            border-radius: 100%;
+            transform: scale(1, 1) translate(-50%, -50%);
+            transform-origin: 50% 50%;
+        }
+        
+        .btn:focus:not(:active)::after {
+            animation: ripple 1s ease-out;
+        }
+        
+        @keyframes ripple {
+            0% {
+                transform: scale(0, 0);
+                opacity: 0.5;
+            }
+            100% {
+                transform: scale(20, 20);
+                opacity: 0;
+            }
+        }
+        
+        .alert {
+            border-radius: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <!-- Header -->
+                <div class="text-center mb-5" data-aos="fade-down" data-aos-duration="800">
+                    <h1 class="display-5 fw-bold text-primary mb-3">Dự đoán tình trạng béo phì</h1>
+                    <p class="lead text-muted">Hoàn thành bảng câu hỏi dưới đây để nhận đánh giá về nguy cơ béo phì dựa trên lối sống và thói quen của bạn.</p>
+                </div>
+                
+                <!-- Sample Buttons -->
+                <div class="mb-4 text-center" data-aos="fade-up" data-aos-duration="800" data-aos-delay="100">
+                    <h5 class="mb-3">Chọn mẫu dữ liệu để thử:</h5>
+                    <button type="button" class="btn btn-sample btn-sample-class1" onclick="fillSample('class1')">Mẫu Class 1</button>
+                    <button type="button" class="btn btn-sample btn-sample-class2" onclick="fillSample('class2')">Mẫu Class 2</button>
+                    <button type="button" class="btn btn-sample btn-sample-class3" onclick="fillSample('class3')">Mẫu Class 3</button>
+                    <button type="button" class="btn btn-sample btn-sample-class4" onclick="fillSample('class4')">Mẫu Class 4</button>
+                    <div class="sample-selection-text" id="sample-selection-text"></div>
+                </div>
+                
+                <!-- Progress Bar -->
+                <div class="mb-4" data-aos="fade-up" data-aos-duration="800" data-aos-delay="200">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-muted">Tiến độ hoàn thành</span>
+                        <span class="badge bg-primary" id="progress-percentage">0%</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar" id="form-progress" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+                
+                <!-- Form Container -->
+                <div class="form-container" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="400">
+                    <div class="form-header">
+                        <h2 class="form-title">Thông tin sức khỏe</h2>
+                        <p class="form-subtitle">Cung cấp thông tin chính xác để nhận kết quả dự đoán chính xác nhất.</p>
+                    </div>
+                    
+                    <div class="form-body">
+                        <form id="obesity-form" action="/predict" method="post">
+                            <!-- Tabs -->
+                            <ul class="nav nav-tabs" id="formTabs" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active" id="personal-tab" data-bs-toggle="tab" data-bs-target="#personal" type="button" role="tab" aria-controls="personal" aria-selected="true">
+                                        <i class="bi bi-person-fill tab-icon"></i>Cá nhân
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="lifestyle-tab" data-bs-toggle="tab" data-bs-target="#lifestyle" type="button" role="tab" aria-controls="lifestyle" aria-selected="false">
+                                        <i class="bi" aria-hidden="true"></i>Lối sống
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="habits-tab" data-bs-toggle="tab" data-bs-target="#habits" type="button" role="tab" aria-controls="habits" aria-selected="false">
+                                        <i class="bi bi-lightning-fill tab-icon"></i>Thói quen
+                                    </button>
+                                </li>
+                            </ul>
+                            
+                            <!-- Tab Content -->
+                            <div class="tab-content" id="formTabsContent">
+                                <!-- Personal Tab -->
+                                <div class="tab-pane fade show active" id="personal" role="tabpanel" aria-labelledby="personal-tab">
+                                    <div class="row g-4">
+                                        <div class="col-md-6">
+                                            <label for="Age" class="form-label">Tuổi</label>
+                                            <input type="number" class="form-control" id="Age" name="Age" required min="1" max="120" placeholder="Nhập tuổi">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="Height" class="form-label">Chiều cao (cm)</label>
+                                            <input type="number" class="form-control" id="Height" name="Height" required min="50" max="250" placeholder="Nhập chiều cao">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="Sex" class="form-label">Giới tính</label>
+                                            <select class="form-select" id="Sex" name="Sex" required>
+                                                <option value="" disabled selected>Chọn</option>
+                                                <option value="1">Nam</option>
+                                                <option value="2">Nữ</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="Overweight_Obese_Family" class="form-label">Gia đình có người béo phì/thừa cân</label>
+                                            <select class="form-select" id="Overweight_Obese_Family" name="Overweight_Obese_Family" required>
+                                                <option value="" disabled selected>Chọn</option>
+                                                <option value="1">Có</option>
+                                                <option value="2">Không</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="d-flex justify-content-end mt-4">
+                                        <button type="button" class="btn btn-primary" onclick="nextTab('lifestyle-tab')">
+                                            Tiếp theo <i class="bi bi-arrow-right ms-2"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Lifestyle Tab -->
+                                <div class="tab-pane fade" id="lifestyle" role="tabpanel" aria-labelledby="lifestyle-tab">
+                                    <div class="row g-4">
+                                        <div class="col-md-6">
+                                            <label for="Consumption_of_Fast_Food" class="form-label">Thường xuyên ăn đồ ăn nhanh</label>
+                                            <select class="form-select" id="Consumption_of_Fast_Food" name="Consumption_of_Fast_Food" required>
+                                                <option value="" disabled selected>Chọn</option>
+                                                <option value="1">Có</option>
+                                                <option value="2">Không</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="Smoking" class="form-label">Hút thuốc lá</label>
+                                            <select class="form-select" id="Smoking" name="Smoking" required>
+                                                <option value="" disabled selected>Chọn</option>
+                                                <option value="1">Có</option>
+                                                <option value="2">Không</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="Calculation_of_Calorie_Intake" class="form-label">Tính toán lượng calo nạp mỗi ngày</label>
+                                            <select class="form-select" id="Calculation_of_Calorie_Intake" name="Calculation_of_Calorie_Intake" required>
+                                                <option value="" disabled selected>Chọn</option>
+                                                <option value="1">Có</option>
+                                                <option value="2">Không</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="Frequency_of_Consuming_Vegetables" class="form-label">Tần suất ăn rau xanh</label>
+                                            <select class="form-select" id="Frequency_of_Consuming_Vegetables" name="Frequency_of_Consuming_Vegetables" required>
+                                                <option value="" disabled selected>Chọn</option>
+                                                <option value="1">Hiếm khi</option>
+                                                <option value="2">Thỉnh thoảng</option>
+                                                <option value="3">Luôn luôn</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="Number_of_Main_Meals_Daily" class="form-label">Số bữa chính mỗi ngày</label>
+                                            <select class="form-select" id="Number_of_Main_Meals_Daily" name="Number_of_Main_Meals_Daily" required>
+                                                <option value="" disabled selected>Chọn</option>
+                                                <option value="1">1-2 bữa</option>
+                                                <option value="2">3 bữa</option>
+                                                <option value="3">Trên 3 bữa</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="d-flex justify-content-between mt-4">
+                                        <button type="button" class="btn btn-outline-secondary" onclick="nextTab('personal-tab')">
+                                            <i class="bi bi-arrow-left me-2"></i> Quay lại
+                                        </button>
+                                        <button type="button" class="btn btn-primary" onclick="nextTab('habits-tab')">
+                                            Tiếp theo <i class="bi bi-arrow-right ms-2"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Habits Tab -->
+                                <div class="tab-pane fade" id="habits" role="tabpanel" aria-labelledby="habits-tab">
+                                    <div class="row g-4">
+                                        <div class="col-md-6">
+                                            <label for="Food_Intake_Between_Meals" class="form-label">Ăn vặt giữa các bữa ăn</label>
+                                            <select class="form-select" id="Food_Intake_Between_Meals" name="Food_Intake_Between_Meals" required>
+                                                <option value="" disabled selected>Chọn</option>
+                                                <option value="1">Hiếm khi</option>
+                                                <option value="2">Thỉnh thoảng</option>
+                                                <option value="3">Thường xuyên</option>
+                                                <option value="4">Luôn luôn</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="Liquid_Intake_Daily" class="form-label">Lượng nước uống mỗi ngày</label>
+                                            <select class="form-select" id="Liquid_Intake_Daily" name="Liquid_Intake_Daily" required>
+                                                <option value="" disabled selected>Chọn</option>
+                                                <option value="1">Dưới 1 lít</option>
+                                                <option value="2">1-2 lít</option>
+                                                <option value="3">Trên 2 lít</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="Physical_Excercise" class="form-label">Tập thể dục mỗi tuần</label>
+                                            <select class="form-select" id="Physical_Excercise" name="Physical_Excercise" required>
+                                                <option value="" disabled selected>Chọn</option>
+                                                <option value="1">Không tập</option>
+                                                <option value="2">1-2 buổi</option>
+                                                <option value="3">3-4 buổi</option>
+                                                <option value="4">5-6 buổi</option>
+                                                <option value="5">Trên 6 buổi</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="Schedule_Dedicated_to_Technology" class="form-label">Thời gian sử dụng công nghệ mỗi ngày</label>
+                                            <select class="form-select" id="Schedule_Dedicated_to_Technology" name="Schedule_Dedicated_to_Technology" required>
+                                                <option value="" disabled selected>Chọn</option>
+                                                <option value="1">0-2 giờ</option>
+                                                <option value="2">3-5 giờ</option>
+                                                <option value="3">Trên 5 giờ</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="Type_of_Transportation_Used" class="form-label">Phương tiện di chuyển chính</label>
+                                            <select class="form-select" id="Type_of_Transportation_Used" name="Type_of_Transportation_Used" required>
+                                                <option value="" disabled selected>Chọn</option>
+                                                <option value="1">Ô tô</option>
+                                                <option value="2">Xe máy</option>
+                                                <option value="3">Xe đạp</option>
+                                                <option value="4">Phương tiện công cộng</option>
+                                                <option value="5">Đi bộ</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="d-flex justify-content-between mt-4">
+                                        <button type="button" class="btn btn-outline-secondary" onclick="nextTab('lifestyle-tab')">
+                                            <i class="bi bi-arrow-left me-2"></i> Quay lại
+                                        </button>
+                                        <button type="submit" class="btn btn-primary" id="submit-btn">
+                                            <i class="bi bi-stars me-2"></i> Dự đoán
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Results Container (Initially Hidden) -->
+                <div class="result-container mt-4" id="result-container" style="display: none;" data-aos="fade-up" data-aos-duration="1000">
+                    <h3 class="result-title">
+                        <i class="bi bi-bar-chart-fill me-2"></i> Kết quả dự đoán
+                    </h3>
+                    <div class="result-content" id="prediction-text">
+                        {% if prediction_text %}
+                            {{ prediction_text | safe }}
+                        {% endif %}
+                    </div>
+                    <div class="result-note">
+                        <p>Lưu ý: Đây chỉ là kết quả dự đoán dựa trên thông tin bạn cung cấp. Để có đánh giá chính xác, vui lòng tham khảo ý kiến chuyên gia y tế.</p>
+                    </div>
+                    <div class="mt-3">
+                        <button type="button" class="btn btn-outline-secondary" onclick="resetForm()">
+                            <i class="bi bi-arrow-repeat me-2"></i> Làm lại bài đánh giá
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- AOS Animation Library -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    
+    <script>
+        // Sample data for each class
+        const sampleData = {
+            class1: {
+                Sex: "1",
+                Age: "19",
+                Height: "168",
+                Overweight_Obese_Family: "2",
+                Consumption_of_Fast_Food: "2",
+                Frequency_of_Consuming_Vegetables: "1",
+                Number_of_Main_Meals_Daily: "1",
+                Food_Intake_Between_Meals: "2",
+                Smoking: "2",
+                Liquid_Intake_Daily: "1",
+                Calculation_of_Calorie_Intake: "2",
+                Physical_Excercise: "4",
+                Schedule_Dedicated_to_Technology: "2",
+                Type_of_Transportation_Used: "5"
+            },
+            class2: {
+                Sex: "2",
+                Age: "19",
+                Height: "165",
+                Overweight_Obese_Family: "2",
+                Consumption_of_Fast_Food: "2",
+                Frequency_of_Consuming_Vegetables: "3",
+                Number_of_Main_Meals_Daily: "1",
+                Food_Intake_Between_Meals: "2",
+                Smoking: "2",
+                Liquid_Intake_Daily: "1",
+                Calculation_of_Calorie_Intake: "2",
+                Physical_Excercise: "2",
+                Schedule_Dedicated_to_Technology: "3",
+                Type_of_Transportation_Used: "4"
+            },
+            class3: {
+                Sex: "2",
+                Age: "35",
+                Height: "169",
+                Overweight_Obese_Family: "2",
+                Consumption_of_Fast_Food: "1",
+                Frequency_of_Consuming_Vegetables: "1",
+                Number_of_Main_Meals_Daily: "3",
+                Food_Intake_Between_Meals: "1",
+                Smoking: "2",
+                Liquid_Intake_Daily: "3",
+                Calculation_of_Calorie_Intake: "1",
+                Physical_Excercise: "4",
+                Schedule_Dedicated_to_Technology: "1",
+                Type_of_Transportation_Used: "1"
+            },
+            class4: {
+                Sex: "1",
+                Age: "54",
+                Height: "173",
+                Overweight_Obese_Family: "2",
+                Consumption_of_Fast_Food: "1",
+                Frequency_of_Consuming_Vegetables: "1",
+                Number_of_Main_Meals_Daily: "2",
+                Food_Intake_Between_Meals: "2",
+                Smoking: "2",
+                Liquid_Intake_Daily: "3",
+                Calculation_of_Calorie_Intake: "2",
+                Physical_Excercise: "4",
+                Schedule_Dedicated_to_Technology: "2",
+                Type_of_Transportation_Used: "2"
+            }
+        };
+
+        // Initialize AOS animation library
+        document.addEventListener('DOMContentLoaded', function() {
+            AOS.init();
+            
+            // Add event listeners to all form inputs for progress calculation
+            const formInputs = document.querySelectorAll('input, select');
+            formInputs.forEach(input => {
+                input.addEventListener('change', updateProgress);
+            });
+            
+            // Add event listeners to tab buttons
+            const tabButtons = document.querySelectorAll('[data-bs-toggle="tab"]');
+            tabButtons.forEach(button => {
+                button.addEventListener('shown.bs.tab', function() {
+                    updateProgress();
+                });
+            });
+
+            // Add event listeners to sample buttons for active state and selection text
+            const sampleButtons = document.querySelectorAll('.btn-sample');
+            const selectionText = document.getElementById('sample-selection-text');
+            sampleButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Remove active class from all buttons
+                    sampleButtons.forEach(btn => btn.classList.remove('active'));
+                    // Add active class to clicked button
+                    this.classList.add('active');
+                    // Update selection text
+                    const classType = this.textContent.trim();
+                    selectionText.textContent = `Đang chọn: ${classType}`;
+                });
+            });
+
+            // Display prediction text if available
+            const predictionText = document.getElementById('prediction-text').innerHTML.trim();
+            if (predictionText) {
+                document.getElementById('result-container').style.display = 'block';
+                document.getElementById('result-container').scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+        
+        // Function to switch tabs
+        function nextTab(tabId) {
+            const tabElement = document.getElementById(tabId);
+            const tab = new bootstrap.Tab(tabElement);
+            tab.show();
+        }
+        
+        // Function to update progress bar
+        function updateProgress() {
+            const form = document.getElementById('obesity-form');
+            const formElements = form.querySelectorAll('input, select');
+            let filledCount = 0;
+            
+            formElements.forEach(element => {
+                if (element.value) {
+                    filledCount++;
+                }
+            });
+            
+            const totalFields = formElements.length;
+            const progressPercentage = Math.round((filledCount / totalFields) * 100);
+            
+            document.getElementById('form-progress').style.width = progressPercentage + '%';
+            document.getElementById('form-progress').setAttribute('aria-valuenow', progressPercentage);
+            document.getElementById('progress-percentage').textContent = progressPercentage + '%';
+        }
+        
+        // Function to fill form with sample data
+        function fillSample(classType) {
+            const data = sampleData[classType];
+            for (const [key, value] of Object.entries(data)) {
+                const element = document.getElementById(key);
+                if (element) {
+                    element.value = value;
+                    element.dispatchEvent(new Event('change')); // Trigger change event to update progress
+                }
+            }
+            nextTab('personal-tab'); // Go to the first tab
+        }
+        
+        // Reset form
+        function resetForm() {
+            document.getElementById('obesity-form').reset();
+            document.getElementById('result-container').style.display = 'none';
+            nextTab('personal-tab');
+            updateProgress();
+            
+            // Remove active class from all sample buttons and clear selection text
+            const sampleButtons = document.querySelectorAll('.btn-sample');
+            const selectionText = document.getElementById('sample-selection-text');
+            sampleButtons.forEach(button => button.classList.remove('active'));
+            selectionText.textContent = '';
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // Add animation to form fields when focused
+        const formControls = document.querySelectorAll('.form-control, .form-select');
+        formControls.forEach(control => {
+            control.addEventListener('focus', function() {
+                this.classList.add('animate__animated', 'animate__pulse');
+            });
+            
+            control.addEventListener('blur', function() {
+                this.classList.remove('animate__animated', 'animate__pulse');
+            });
+        });
+    </script>
+</body>
+</html>
