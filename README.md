@@ -11,7 +11,7 @@
 - Dùng GridSearchCV tìm lưới tham số để tối ưu hóa mô hình dự đoán
 - Cung cấp mã nguồn, mô hình, và hướng dẫn tái sử dụng.
 
-### ⚙️ Tính năng chính:
+### Tính năng chính:
 - Tiền xử lý dữ liệu bằng Python (Jupyter Notebook).
 - Huấn luyện mô hình phân loại (XGBoost).
 - Lưu mô hình bằng `joblib` để tái sử dụng.
@@ -19,9 +19,9 @@
 
 ---
 
-## 2. 💻 Yêu Cầu Hệ Thống
+### 2. Yêu Cầu Hệ Thống
 
-### 🧩 Phần mềm:
+### Phần mềm:
 - Python 3.8+
 - Jupyter Notebook
 - Git (để clone repo)
